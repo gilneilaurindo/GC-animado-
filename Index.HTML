@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GC Animado - BrisaCast 2026</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brisa: { orange: '#FF7E05', blue: '#2242D4', dark: '#1A34A8', purple: '#6B21A8' }
+                    },
+                    fontFamily: { sans: ['Figtree', 'sans-serif'], heading: ['Figtree', 'sans-serif'] },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Figtree', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* -------------------------------------------
+           VISUAL DO OBS (TELA DA LIVE)
+        -------------------------------------------- */
+        .obs-mode {
+            background-color: transparent !important;
+        }
+
+        .gc-container {
+            position: absolute;
+            bottom: 40px;
+            left: 50px;
+            width: 80%;
+            max-width: 1200px;
+            z-index: 50;
+            transform: translateY(150%) scale(0.95);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+        }
+        
+        .gc-container.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .glass-box {
+            background: linear-gradient(135deg, rgba(26,52,168,0.98) 0%, rgba(34,66,212,0.90) 100%);
+            backdrop-filter: blur(10px);
+            border-left: 6px solid #FF7E05;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Padrão de bolinhas sutis ao fundo do GC (remete à landing page) */
+        .glass-box::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.1) 2px, transparent 2px);
+            background-size: 20px 20px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Elementos flutuantes de fundo dentro do GC */
+        .gc-bg-icon {
+            position: absolute;
+            color: rgba(255,255,255,0.05);
+            z-index: 0;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        /* Brilho animado passando pelo texto */
+        .glass-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            animation: shine 8s infinite;
+            z-index: 10;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-bottom: 2px solid #6B21A8;
+        }
+
+        .ticker-move {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 25s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* Botão Secreto para abrir o painel (Fica invisível na Live) */
+        .secret-trigger {
+            position: absolute; top: 10px; left: 10px;
+            width: 40px; height: 40px;
+            opacity: 0.01;
+            transition: opacity 0.3s;
+            z-index: 9999;
+            cursor: pointer;
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .secret-trigger:hover { opacity: 1; background: rgba(0,0,0,0.5); border-radius: 8px; }
+
+        /* -------------------------------------------
+           VISUAL DO PAINEL DE CONTROLE (OPERADOR)
+        -------------------------------------------- */
+        .panel-mode {
+            background-color: #FF7E05; /* Cor oficial Brisanet */
+            background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
+            background-size: 30px 30px;
+            overflow-y: auto;
+        }
+
+        .panel-card {
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1rem;
+            transition: transform 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+        .panel-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        .panel-card.active-btn {
+            background: #1A34A8;
+            border-color: #2242D4;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body id="main-body" class="obs-mode">
+
+    <!-- ========================================================
+         VIEW 1: OVERLAY DO OBS (Visível apenas na live)
+    ========================================================= -->
+    <div id="obs-view">
+        <!-- Botão secreto que o operador clica no Chrome para abrir o painel -->
+        <a href="?panel=true" target="_blank" class="secret-trigger" title="Abrir Painel de Controle">
+            <i class="fa-solid fa-gamepad text-xl"></i>
+        </a>
+
+        <!-- CONTAINER DO GC (LOWER THIRD) -->
+        <div id="gc-wrapper" class="gc-container flex flex-col items-start">
+            
+            <!-- Aba Roxa -->
+            <div class="flex items-end">
+                <div id="gc-badge" class="bg-brisa-purple text-white font-extrabold px-6 py-2 rounded-t-xl shadow-lg uppercase tracking-widest text-sm border-b-2 border-brisa-orange flex items-center gap-2">
+                    <i class="fa-solid fa-circle text-red-500 animate-pulse text-[10px]" id="live-icon"></i>
+                    <span id="badge-text">AO VIVO | BRISACAST</span>
+                </div>
+                <div class="h-0 w-0 border-b-[36px] border-b-brisa-purple border-r-[20px] border-r-transparent ml-[-1px]"></div>
+            </div>
+
+            <!-- Box Principal (Título e Subtítulo) -->
+            <div class="glass-box w-full p-6 rounded-b-xl rounded-tr-xl flex items-center justify-between gap-6 z-10 relative">
+                <!-- Ícones de Fundo -->
+                <i class="fa-solid fa-graduation-cap text-6xl gc-bg-icon right-[10%] top-[10%]"></i>
+                <i class="fa-solid fa-lightbulb text-5xl gc-bg-icon right-[30%] bottom-[10%]" style="animation-delay: 2s;"></i>
+
+                <div class="flex-1 relative z-10">
+                    <h1 id="gc-title" class="font-heading font-extrabold text-4xl md:text-5xl uppercase tracking-tight mb-2 drop-shadow-lg text-white">
+                        ABERTURA & VISÃO ESTRATÉGICA
+                    </h1>
+                    <h2 id="gc-subtitle" class="text-xl md:text-2xl font-semibold text-gray-200 drop-shadow-md">
+                        A trajetória da Unibrisa e o Ecossistema de Aprendizagem
+                    </h2>
+                </div>
+                
+                <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" class="h-16 object-contain opacity-90 filter drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] relative z-10">
+            </div>
+
+            <!-- Rodapé Deslizante (Ticker) -->
+            <div class="ticker-wrap h-10 items-center">
+                <div id="gc-ticker" class="ticker-move text-lg font-bold tracking-wide text-gray-100 flex items-center">
+                    Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag <span class="text-brisa-orange mx-2">#ConectadosPeloAprendizado</span> e concorra a prêmios! 🚀 • Sejam bem-vindos à Positivação Unibrisa 2026!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         VIEW 2: PAINEL DE CONTROLE (Isolado da Live)
+    ========================================================= -->
+    <div id="panel-view" class="hidden w-full h-full p-8 flex flex-col items-center">
+        
+        <div class="text-center mb-8">
+            <img src="https://raw.githubusercontent.com/gilneilaurindo/Paineisdalive/main/Logo%20Brisacast.png" class="h-20 mx-auto drop-shadow-lg mb-4">
+            <h1 class="text-4xl font-extrabold font-heading drop-shadow-md uppercase">Painel de Controle Remoto</h1>
+            <p class="text-lg font-bold opacity-90">Controle o GC do OBS a partir daqui!</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+            <!-- Botões gerados via JS -->
+            <div onclick="remoteTrigger(1, this)" id="btn-1" class="panel-card p-6 flex flex-col justify-between">
+                <div>
+                    <span class="bg-brisa-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">09:00</span>
+                    <h3 class="font-bold text-xl mt-3 mb-1">Abertura & Visão Estratégica</h3>
+                    <p class="text-sm opacity-80 line-clamp-2">A trajetória da Unibrisa...</p>
+                </div>
+            </div>
+            
+            <div onclick="remoteTrigger(2, this)" id="btn-2" class="panel-card p-6 flex flex-col justify-between">
+                <div>
+                    <span class="bg-brisa-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">09:30</span>
+                    <h3 class="font-bold text-xl mt-3 mb-1">Painel Cibersegurança</h3>
+                    <p class="text-sm opacity-80 line-clamp-2">Com Valcerlan Almeida...</p>
+                </div>
+            </div>
+
+            <div onclick="remoteTrigger(3, this)" id="btn-3" class="panel-card p-6 flex flex-col justify-between">
+                <div>
+                    <span class="bg-brisa-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">13:30</span>
+                    <h3 class="font-bold text-xl mt-3 mb-1">Painel Google Cloud</h3>
+                    <p class="text-sm opacity-80 line-clamp-2">Convidados: Natan e Igor...</p>
+                </div>
+            </div>
+
+            <div onclick="remoteTrigger(4, this)" id="btn-4" class="panel-card p-6 flex flex-col justify-between">
+                <div>
+                    <span class="bg-brisa-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Maratona</span>
+                    <h3 class="font-bold text-xl mt-3 mb-1">Acelere sua Carreira!</h3>
+                    <p class="text-sm opacity-80 line-clamp-2">5 dias de imersão...</p>
+                </div>
+            </div>
+
+            <div onclick="remoteTrigger(5, this)" id="btn-5" class="panel-card p-6 flex flex-col justify-between">
+                <div>
+                    <span class="bg-brisa-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">16:30</span>
+                    <h3 class="font-bold text-xl mt-3 mb-1">Resultados Oficiais</h3>
+                    <p class="text-sm opacity-80 line-clamp-2">Top 5 Aprendentes...</p>
+                </div>
+            </div>
+
+            <!-- Botão de Esconder -->
+            <div onclick="remoteHide()" class="panel-card p-6 flex flex-col justify-center items-center bg-red-600/50 border-red-400 hover:bg-red-500/80">
+                <i class="fa-solid fa-eye-slash text-4xl mb-2"></i>
+                <h3 class="font-bold text-xl uppercase tracking-widest">Remover GC da Tela</h3>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-black/30 px-6 py-3 rounded-xl border border-white/20 text-sm">
+            <i class="fa-solid fa-circle-info mr-2"></i> Os cliques aqui enviarão o comando automático para o OBS Studio.
+        </div>
+    </div>
+
+    <!-- SCRIPT DO SISTEMA -->
+    <script>
+        // Detecta automaticamente se está rodando dentro do OBS Studio
+        // Se estiver no OBS, remove o botão secreto para não aparecer na ferramenta "Interagir"
+        if (window.obsstudio || navigator.userAgent.includes("OBS")) {
+            const secretBtn = document.querySelector('.secret-trigger');
+            if (secretBtn) secretBtn.style.display = 'none';
+        }
+
+        // Dados dos GCs
+        const moments = {
+            1: { badge: "AO VIVO | BRISACAST", title: "ABERTURA & VISÃO ESTRATÉGICA", subtitle: "A trajetória da Unibrisa e o Ecossistema de Aprendizagem", ticker: "Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag <span class='text-brisa-orange mx-2'>#ConectadosPeloAprendizado</span> e concorra a prêmios! 🚀 • Sejam bem-vindos à Positivação Unibrisa 2026!", showLiveIcon: true },
+            2: { badge: "PAINEL 01 | CIBERSEGURANÇA", title: "CIBERSEGURANÇA NO GRUPO BRISANET", subtitle: "Com Valcerlan Almeida, Flavia Paulino, Lucas Kennedy e William Heller", ticker: "Fique atento às dicas de segurança digital! 🔒 • Próximo painel às 10h30: Compliance e Código de Ética • Use a hashtag <span class='text-brisa-orange mx-2'>#ConectadosPeloAprendizado</span>", showLiveIcon: false },
+            3: { badge: "PAINEL 03 | GOOGLE CLOUD", title: "PRODUTIVIDADE COM GEMINI E WORKSPACE", subtitle: "Convidados: Natan Valenciano e Igor Carolino", ticker: "Descubra como a Inteligência Artificial pode acelerar sua rotina! 💡 • Lembre-se de conferir os Cursos Plus Brisa na plataforma • Fique ligado nos quizzes para pontuar no Ranking!", showLiveIcon: false },
+            4: { badge: "MARATONA DO CONHECIMENTO", title: "ACELERE SUA CARREIRA!", subtitle: "5 dias de imersão na plataforma Unibrisa", ticker: "Realize os cursos, garanta a melhor pontuação nos Quizzes e suba no Ranking Público! 🏆 • As áreas com 100% de conclusão em cibersegurança serão reconhecidas!", showLiveIcon: false },
+            5: { badge: "RESULTADOS OFICIAIS", title: "TOP 5 APRENDENTES E DESTAQUES", subtitle: "Conheça a Regional Destaque de hoje!", ticker: "Parabéns a todos os participantes! 🎉 • Continue sua jornada no Universo Brisa • Nos vemos amanhã para mais conhecimento na Positivação Unibrisa 2026!", showLiveIcon: false }
+        };
+
+        // Identifica se é Tela do OBS ou Painel de Controle via URL (?panel=true)
+        const isPanel = window.location.search.includes('panel=true');
+        const channel = new BroadcastChannel('brisacast_gc_channel');
+        
+        const gcWrapper = document.getElementById('gc-wrapper');
+        let currentId = null;
+
+        if (isPanel) {
+            // MODO: PAINEL DE CONTROLE (NO NAVEGADOR DO OPERADOR)
+            document.getElementById('obs-view').style.display = 'none';
+            document.getElementById('panel-view').style.display = 'flex';
+            document.getElementById('main-body').classList.remove('obs-mode');
+            document.getElementById('main-body').classList.add('panel-mode');
+            document.title = "CONTROLE - GC BrisaCast";
+
+            // Sincroniza o estado inicial
+            channel.postMessage({ command: 'ping' });
+            
+            channel.onmessage = (e) => {
+                if (e.data.command === 'state') {
+                    document.querySelectorAll('.panel-card').forEach(c => c.classList.remove('active-btn'));
+                    if(e.data.id) document.getElementById('btn-' + e.data.id)?.classList.add('active-btn');
+                }
+            };
+
+        } else {
+            // MODO: OBS OVERLAY (TELA TRANSPARENTE DA LIVE)
+            document.getElementById('obs-view').style.display = 'block';
+            document.getElementById('panel-view').style.display = 'none';
+
+            // Escuta os comandos vindos do Painel de Controle
+            channel.onmessage = (e) => {
+                if (e.data.command === 'trigger') {
+                    triggerGCLocal(e.data.id);
+                } else if (e.data.command === 'hide') {
+                    hideGCLocal();
+                } else if (e.data.command === 'ping') {
+                    channel.postMessage({ command: 'state', id: currentId });
+                }
+            };
+        }
+
+        // --- FUNÇÕES DO PAINEL (Envia Comandos) ---
+        function remoteTrigger(id, btnElement) {
+            document.querySelectorAll('.panel-card').forEach(c => c.classList.remove('active-btn'));
+            btnElement.classList.add('active-btn');
+            channel.postMessage({ command: 'trigger', id: id });
+        }
+
+        function remoteHide() {
+            document.querySelectorAll('.panel-card').forEach(c => c.classList.remove('active-btn'));
+            channel.postMessage({ command: 'hide' });
+        }
+
+        // --- FUNÇÕES DO OBS (Executa Comandos) ---
+        function triggerGCLocal(id) {
+            if (currentId === id && gcWrapper.classList.contains('active')) {
+                hideGCLocal();
+                return;
+            }
+
+            if (gcWrapper.classList.contains('active')) {
+                hideGCLocal();
+                setTimeout(() => updateAndShow(id), 600);
+            } else {
+                updateAndShow(id);
+            }
+            
+            currentId = id;
+            channel.postMessage({ command: 'state', id: currentId }); // Atualiza painel caso haja vários abertos
+        }
+
+        function updateAndShow(id) {
+            const data = moments[id];
+            document.getElementById('badge-text').innerHTML = data.badge;
+            document.getElementById('gc-title').innerHTML = data.title;
+            document.getElementById('gc-subtitle').innerHTML = data.subtitle;
+            
+            const liveIcon = document.getElementById('live-icon');
+            liveIcon.style.display = data.showLiveIcon ? 'inline-block' : 'none';
+
+            const tickerEl = document.getElementById('gc-ticker');
+            tickerEl.style.animation = 'none';
+            tickerEl.innerHTML = data.ticker + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " + data.ticker;
+            tickerEl.offsetHeight; 
+            tickerEl.style.animation = null; 
+
+            gcWrapper.classList.add('active');
+        }
+
+        function hideGCLocal() {
+            gcWrapper.classList.remove('active');
+            currentId = null;
+            channel.postMessage({ command: 'state', id: null });
+        }
+
+    </script>
+</body>
+</html>
