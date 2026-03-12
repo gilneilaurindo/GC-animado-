@@ -44,17 +44,17 @@
             color: white;
         }
 
-        /* Contedor 16:9 */
+        /* Contedor cravado em 1920x1080 para OBS */
         .viewport-16-9 {
-            position: relative;
-            width: 100vw;
-            height: 56.25vw;
-            max-height: 100vh;
-            max-width: 177.77vh;
-            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1920px;
+            height: 1080px;
             overflow: hidden;
             /* Garantir que o fondo do contedor tamén sexa verde */
             background-color: #00FF00;
+            transform-origin: top left;
         }
 
         /* Glassmorphism - Efecto de cristal con desenfoque */
@@ -152,55 +152,85 @@
 
         <!-- RODAPÉ DESLIZANTE (TICKER) -->
         <div class="absolute bottom-0 left-0 w-full h-14 bg-brisa-blue border-t-4 border-brisa-orange flex items-center overflow-hidden">
-            <div class="bg-brisa-orange h-full px-6 flex items-center z-10 font-black italic text-white shadow-lg">
+            <div class="bg-brisa-orange h-full px-6 flex items-center z-10 font-black italic text-white shadow-lg text-xl">
                 INFO
             </div>
             <div class="flex-1 overflow-hidden relative h-full flex items-center">
-                <div id="ticker-text" class="ticker-content text-lg font-bold uppercase tracking-wide text-white">
+                <div id="ticker-text" class="ticker-content text-xl font-bold uppercase tracking-wide text-white">
                     Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag #ConectadosPeloAprendizado e concorra a prêmios! • Sejam bem-vindos à Positivação Unibrisa 2026!
                 </div>
             </div>
         </div>
 
-        <!-- CONTROLES PARA O OPERADOR -->
+        <!-- CONTROLES PARA O OPERADOR (50% esquerda, 50% direita) -->
         <div class="absolute inset-0 z-50 flex pointer-events-none">
-            <div onclick="changeMoment(-1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Anterior"></div>
-            <div onclick="changeMoment(1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Seguinte"></div>
+            <div onclick="changeMoment(-1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Voltar (Anterior)"></div>
+            <div onclick="changeMoment(1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Avançar (Seguinte)"></div>
         </div>
     </div>
 
     <script>
-        // Datos dos momentos da transmisión
+        // Datos de TODOS os 10 momentos da transmisión
         const moments = [
             {
                 label: "AO VIVO | BRISACAST",
-                title: "ABERTURA & VISÃO ESTRATÉGICA",
-                sub: "A trajetória da Unibrisa e o Ecossistema de Aprendizagem",
-                ticker: "Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag #ConectadosPeloAprendizado e concorra a prêmios! • Sejam bem-vindos à Positivação Unibrisa 2026!"
+                title: "O FUTURO É AGORA",
+                sub: "Bem-vindos à Positivação Unibrisa 2026",
+                ticker: "A transmissão iniciará em breve! • Prepare-se para um dia de muito aprendizado! • Use a hashtag #ConectadosPeloAprendizado"
             },
             {
-                label: "PAINEL 01 | CIBERSEGURANÇA",
+                label: "09:00 - 09:30 | ABERTURA",
+                title: "ABERTURA & VISÃO ESTRATÉGICA",
+                sub: "A trajetória da Unibrisa e o Ecossistema de Aprendizagem",
+                ticker: "Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag #ConectadosPeloAprendizado e concorra a prêmios!"
+            },
+            {
+                label: "09:30 - 10:30 | PAINEL 01",
                 title: "CIBERSEGURANÇA NO GRUPO BRISANET",
                 sub: "Com Valcerlan Almeida, Flavia Paulino, Lucas Kennedy e William Heller",
                 ticker: "Fique atento às dicas de segurança digital! • Próximo painel às 10h30: Compliance e Código de Ética • Use a hashtag #ConectadosPeloAprendizado"
             },
             {
-                label: "PAINEL 03 | GOOGLE CLOUD",
+                label: "10:30 - 12:00 | PAINEL 02",
+                title: "COMPLIANCE NA PRÁTICA",
+                sub: "Código de Ética de Bolso com David, Juliana, Luciana e João P.",
+                ticker: "Aja sempre com ética e transparência. • Dúvidas? Utilize o nosso canal de denúncias oficial do Grupo Brisanet."
+            },
+            {
+                label: "12:00 - 13:30 | INTERVALO",
+                title: "PAUSA ESTRATÉGICA",
+                sub: "Recarregue as energias!",
+                ticker: "Voltamos às 13:30 com o Painel sobre Google Cloud! • Aproveite para visitar a nossa Área Vivencial."
+            },
+            {
+                label: "13:30 - 14:30 | PAINEL 03",
                 title: "PRODUTIVIDADE COM GEMINI E WORKSPACE",
                 sub: "Convidados: Natan Valenciano e Igor Carolino",
-                ticker: "Descubra como a Inteligência Artificial pode acelerar sua rotina! 💡 • Lembre-se de conferir os Cursos Plus Brisa na plataforma • Fique ligado nos quizzes para pontuar no Ranking!"
+                ticker: "Descubra como a Inteligência Artificial pode acelerar sua rotina! 💡 • Lembre-se de conferir os Cursos Plus Brisa na plataforma"
             },
             {
-                label: "MARATONA DO CONHECIMENTO",
-                title: "ACELERE SUA CARREIRA!",
-                sub: "5 dias de imersão na plataforma Unibrisa",
-                ticker: "Realize os cursos, garanta a melhor pontuação nos Quizzes e suba no Ranking Público! 🏆 • As áreas com 100% de conclusão em cibersegurança serão reconhecidas!"
+                label: "14:30 - 15:00 | INTERVALO",
+                title: "HORA DO CAFÉ",
+                sub: "Networking e pausa rápida",
+                ticker: "Voltamos em breve! Às 15:00 iniciaremos o Painel sobre Educação Financeira. • Estique as pernas e prepare-se!"
             },
             {
-                label: "RESULTADOS OFICIAIS",
-                title: "TOP 5 APRENDENTES E DESTAQUES",
-                sub: "Conheça a Regional Destaque de hoje!",
-                ticker: "Parabéns a todos os participantes! 🎉 • Continue sua jornada no Universo Brisa • Nos vemos amanhã para mais conhecimento na Positivação Unibrisa 2026!"
+                label: "15:00 - 16:30 | PAINEL 04",
+                title: "EDUCAÇÃO FINANCEIRA",
+                sub: "Estratégias com Ângelo Pessoa e Romário Aquino",
+                ticker: "Aprenda a cuidar do seu futuro financeiro! • Fique ligado nos quizzes para pontuar no Ranking da Unibrisa!"
+            },
+            {
+                label: "16:30 - 16:50 | RESULTADOS",
+                title: "O PÓDIO DO CONHECIMENTO",
+                sub: "Conheça a Regional Destaque de hoje e o Top 5 Aprendentes!",
+                ticker: "Parabéns a todos os participantes! 🎉 • Continue sua jornada no Universo Brisa • O conhecimento transforma!"
+            },
+            {
+                label: "16:50 - 17:00 | ENCERRAMENTO",
+                title: "MOMENTO Q&A DIRETORIA",
+                sub: "Converse com nossos Diretores e alinhe a estratégia",
+                ticker: "Nos vemos amanhã para mais conhecimento na Positivação Unibrisa 2026! • Obrigado pela excelente participação no dia de hoje!"
             }
         ];
 
@@ -235,6 +265,22 @@
             if (e.key === "ArrowLeft") changeMoment(-1);
         });
 
+        // Garantir proporção 1920x1080 e escalar no preview
+        function scaleToFit() {
+            const viewport = document.getElementById('main-container');
+            const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            
+            // Centralizar caso o aspecto da janela non sexa 16:9
+            const left = (window.innerWidth - (1920 * scale)) / 2;
+            const top = (window.innerHeight - (1080 * scale)) / 2;
+            
+            viewport.style.transform = `scale(${scale})`;
+            viewport.style.left = `${left}px`;
+            viewport.style.top = `${top}px`;
+        }
+
+        window.addEventListener('resize', scaleToFit);
+        scaleToFit(); // Executar inicio
         updateUI();
     </script>
 </body>
