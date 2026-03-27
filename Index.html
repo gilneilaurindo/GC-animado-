@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GC Animado - BrisaCast 2026</title>
+    <title>GC Animado - Layout Estratégico Convenção 2026</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Figtree -->
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <script>
@@ -18,9 +18,9 @@
                 extend: {
                     colors: {
                         brisa: {
-                            orange: '#FF7E05',
-                            blue: '#2242D4',
-                            dark: '#1A34A8'
+                            orange: '#FF5022', 
+                            blue: '#FF5022',   
+                            dark: '#000000'
                         }
                     },
                     fontFamily: {
@@ -38,13 +38,11 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            /* Fondo verde para Chroma Key */
-            background-color: #00FF00; 
+            background-color: #00FF00; /* Chroma Key */
             font-family: 'Figtree', sans-serif;
-            color: white;
+            color: black;
         }
 
-        /* Contedor cravado em 1920x1080 para OBS */
         .viewport-16-9 {
             position: absolute;
             top: 0;
@@ -52,22 +50,11 @@
             width: 1920px;
             height: 1080px;
             overflow: hidden;
-            /* Garantir que o fondo do contedor tamén sexa verde */
             background-color: #00FF00;
             transform-origin: top left;
         }
 
-        /* Glassmorphism - Efecto de cristal con desenfoque */
-        .glass-panel {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-left: 6px solid #FF7E05;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border-radius: 0 0 12px 0;
-        }
-
-        /* Animación do Ticker (Rodapé) */
+        /* Animação do Ticker */
         @keyframes tickerScroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -76,35 +63,22 @@
         .ticker-content {
             display: inline-block;
             white-space: nowrap;
-            animation: tickerScroll 30s linear infinite;
+            animation: tickerScroll 25s linear infinite;
         }
 
-        /* Animacións de entrada */
-        .anim-slide-in {
-            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Animações de entrada */
+        .anim-slide-up {
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-40px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Estilo da pestana superior */
-        .moment-tag {
-            background: #FF7E05;
-            clip-path: polygon(0 0, 92% 0, 100% 100%, 0% 100%);
-            padding-right: 45px;
-        }
-
-        /* Branding dentro do GC */
-        .branding-box {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 4px 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        /* Sombra do GC */
+        .gc-shadow {
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -112,146 +86,159 @@
 
     <div class="viewport-16-9" id="main-container">
         
-        <!-- ELEMENTOS DO GC -->
-        <div id="gc-content" class="absolute bottom-24 left-10 w-3/4 max-w-4xl">
+        <!-- ESTRUTURA DO GC QUADRADO -->
+        <div id="gc-main" class="absolute bottom-16 left-20 w-[1450px] anim-slide-up">
             
-            <!-- LOGOTIPOS E ICONA (CABECEIRA) -->
-            <div class="flex items-end anim-slide-in">
-                <!-- Icona de Destaque -->
-                <div class="bg-brisa-orange p-2.5 shadow-lg flex items-center justify-center">
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/Icone.png" 
-                         alt="Icona" class="h-6 w-6 object-contain brightness-0 invert">
+            <div class="flex h-[340px] gc-shadow overflow-hidden">
+                
+                <!-- COLUNA ESQUERDA (BRANDING & PROGRESSO) -->
+                <div class="w-[360px] bg-brisa-orange flex flex-col justify-between items-center py-8 text-white border-r-4 border-black/10">
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-black uppercase tracking-[0.25em] opacity-80">AO VIVO</div>
+                        <!-- CONTADOR DE PAINÉIS -->
+                        <div id="panel-counter" class="mt-2 bg-black/20 px-4 py-1 rounded-full text-xl font-bold border border-white/20">
+                            01 | 10
+                        </div>
+                    </div>
+                    
+                    <div class="px-6 w-full flex justify-center">
+                        <img src="https://raw.githubusercontent.com/gilneilaurindo/Conven-odeL-deres2026/main/logo%20conven%C3%A7%C3%A3o%20de%20lideres.png" 
+                             alt="Convenção de Líderes 2026" class="w-full max-h-[160px] object-contain brightness-0 invert">
+                    </div>
+
+                    <div class="text-2xl font-black uppercase tracking-widest opacity-80">CONVENÇÃO</div>
                 </div>
-                <!-- Logos Institucionais -->
-                <div class="branding-box h-[40px] ml-2">
+
+                <!-- COLUNA DIREITA (CONTEÚDO ESTRATÉGICO BRANCO) -->
+                <div class="flex-1 bg-white flex flex-col px-12 py-8 justify-center border-r-8 border-brisa-orange">
+                    <!-- TAG SUPERIOR / TEMA -->
+                    <div id="moment-label" class="text-brisa-orange text-2xl font-black uppercase tracking-widest mb-4 border-b-2 border-gray-100 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-compass"></i> <span>DIREÇÃO ESTRATÉGICA</span>
+                    </div>
+                    
+                    <!-- TÍTULO PRINCIPAL -->
+                    <h1 id="main-title" class="text-brisa-orange text-[58px] font-black uppercase leading-[1] tracking-tighter mb-5 drop-shadow-sm">
+                        ESTRATÉGIA CLARA, EXECUÇÃO FALHA
+                    </h1>
+                    
+                    <!-- SUBTÍTULO -->
+                    <p id="sub-title" class="text-brisa-blue text-4xl font-extrabold uppercase tracking-tight leading-none italic opacity-90">
+                        O GAP ESTÁ NA EXECUÇÃO DESALINHADA
+                    </p>
+                </div>
+            </div>
+
+            <!-- BARRA DO TICKER (INFERIOR) -->
+            <div class="h-20 bg-black flex items-center overflow-hidden border-t-4 border-brisa-orange">
+                <div class="bg-brisa-orange h-full px-8 flex items-center z-10 font-black italic text-white text-2xl border-r border-white/20">
+                    INSIGHT
+                </div>
+                <div class="flex-1 overflow-hidden relative h-full flex items-center">
+                    <div id="ticker-text" class="ticker-content text-[26px] font-bold uppercase tracking-wide text-white">
+                        “O problema não está nas áreas. Está ENTRE as áreas.” • Menos defesa, mais construção. • O futuro depende da execução — juntos.
+                    </div>
+                </div>
+                
+                <!-- LOGO BRISANET NO TICKER -->
+                <div class="bg-white h-full px-12 flex items-center">
                     <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/logo%20brisanet.png" 
-                         alt="Brisanet" class="h-5 object-contain opacity-90">
-                    <div class="w-[1px] h-4 bg-gray-300"></div>
-                    <img src="https://raw.githubusercontent.com/gilneilaurindo/Positiva-o-Unibrisa/main/logo%20Unibrisa.png" 
-                         alt="Unibrisa" class="h-6 object-contain opacity-90">
-                </div>
-            </div>
-
-            <!-- ETIQUETA DO MOMENTO -->
-            <div class="anim-slide-in" style="animation-delay: 0.1s;">
-                <div id="moment-label" class="moment-tag inline-block px-6 py-2 text-sm font-black uppercase tracking-widest leading-none flex items-center h-[36px]">
-                    AO VIVO | BRISACAST
-                </div>
-            </div>
-
-            <!-- PANEL DE TÍTULO -->
-            <div class="glass-panel p-6 mt-[-1px] anim-slide-in" style="animation-delay: 0.2s;">
-                <h1 id="main-title" class="text-4xl font-black uppercase leading-tight drop-shadow-lg tracking-tight">
-                    ABERTURA & VISÃO ESTRATÉGICA
-                </h1>
-                <p id="sub-title" class="text-xl font-medium text-gray-200 mt-1 italic opacity-95">
-                    A trajetória da Unibrisa e o Ecossistema de Aprendizagem
-                </p>
-            </div>
-        </div>
-
-        <!-- RODAPÉ DESLIZANTE (TICKER) -->
-        <div class="absolute bottom-0 left-0 w-full h-14 bg-brisa-blue border-t-4 border-brisa-orange flex items-center overflow-hidden">
-            <div class="bg-brisa-orange h-full px-6 flex items-center z-10 font-black italic text-white shadow-lg text-xl">
-                INFO
-            </div>
-            <div class="flex-1 overflow-hidden relative h-full flex items-center">
-                <div id="ticker-text" class="ticker-content text-xl font-bold uppercase tracking-wide text-white">
-                    Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag #ConectadosPeloAprendizado e concorra a prêmios! • Sejam bem-vindos à Positivação Unibrisa 2026!
+                         alt="Brisanet" class="h-8 object-contain">
                 </div>
             </div>
         </div>
 
-        <!-- CONTROLES PARA O OPERADOR (50% esquerda, 50% direita) -->
+        <!-- CONTROLES INVISÍVEIS PARA O OPERADOR -->
         <div class="absolute inset-0 z-50 flex pointer-events-none">
-            <div onclick="changeMoment(-1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Voltar (Anterior)"></div>
-            <div onclick="changeMoment(1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Avançar (Seguinte)"></div>
+            <div onclick="changeMoment(-1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Anterior"></div>
+            <div onclick="changeMoment(1)" class="w-1/2 h-full pointer-events-auto cursor-pointer" title="Próximo"></div>
         </div>
     </div>
 
     <script>
-        // Datos de TODOS os 10 momentos da transmisión
         const moments = [
             {
-                label: "AO VIVO | BRISACAST",
-                title: "O FUTURO É AGORA",
-                sub: "Bem-vindos à Positivação Unibrisa 2026",
-                ticker: "A transmissão iniciará em breve! • Prepare-se para um dia de muito aprendizado! • Use a hashtag #ConectadosPeloAprendizado"
+                label: "CONVENÇÃO DE LÍDERES 2026",
+                title: "ESTRATÉGIA CLARA, EXECUÇÃO FALHA",
+                sub: "DA ESTRATÉGIA À EXECUÇÃO COMPARTILHADA",
+                ticker: "O problema NÃO é estratégia — é execução. • A direção nunca mudou, o gap está no alinhamento. • O futuro depende de fazermos juntos."
             },
             {
-                label: "09:00 - 09:30 | ABERTURA",
-                title: "ABERTURA & VISÃO ESTRATÉGICA",
-                sub: "A trajetória da Unibrisa e o Ecossistema de Aprendizagem",
-                ticker: "Participe do nosso sorteio! Poste uma foto assistindo a live com a hashtag #ConectadosPeloAprendizado e concorra a prêmios!"
+                label: "FACILITAÇÃO ESTRATÉGICA",
+                title: "TRANSFORMAÇÃO ORGANIZACIONAL",
+                sub: "SUELLEN IRACI & KELLY RODRIGUES",
+                ticker: "Especialistas em desenvolvimento de lideranças e equipes. • Foco em clareza de contexto e visão do cliente."
             },
             {
-                label: "09:30 - 10:30 | PAINEL 01",
-                title: "CIBERSEGURANÇA NO GRUPO BRISANET",
-                sub: "Com Valcerlan Almeida, Flavia Paulino, Lucas Kennedy e William Heller",
-                ticker: "Fique atento às dicas de segurança digital! • Próximo painel às 10h30: Compliance e Código de Ética • Use a hashtag #ConectadosPeloAprendizado"
+                label: "ALERTA CRÍTICO: SITUAÇÃO ATUAL",
+                title: "META: 100K | REALIDADE: 30K",
+                sub: "O MAIOR RISCO DA COMPANHIA",
+                ticker: "O plano não está em linha com a execução. • Resultado atual é cerca de 1/4 do esperado. • Precisamos de alinhamento urgente."
             },
             {
-                label: "10:30 - 12:00 | PAINEL 02",
-                title: "COMPLIANCE NA PRÁTICA",
-                sub: "Código de Ética de Bolso com David, Juliana, Luciana e João P.",
-                ticker: "Aja sempre com ética e transparência. • Dúvidas? Utilize o nosso canal de denúncias oficial do Grupo Brisanet."
+                label: "OBJETIVO: CRESCIMENTO",
+                title: "CRESCER NÃO É OPCIONAL",
+                sub: "OBRIGAÇÃO E SOBREVIVÊNCIA DO MODELO",
+                ticker: "Compromisso regulatório até 2030. • Churn não é problema isolado, é consequência de jornada ruim. • Responsabilidade de todos."
             },
             {
-                label: "12:00 - 13:30 | INTERVALO",
-                title: "PAUSA ESTRATÉGICA",
-                sub: "Recarregue as energias!",
-                ticker: "Voltamos às 13:30 com o Painel sobre Google Cloud! • Aproveite para visitar a nossa Área Vivencial."
+                label: "DIRECIONAMENTO: QUALIDADE",
+                title: "CRESCIMENTO COM QUALIDADE",
+                sub: "PORTABILIDADE, COMBO 5G E BASE ATUAL",
+                ticker: "Definir o que será priorizado e o que será DESPRIORIZADO. • Fazer trade-offs entre áreas pensando no todo."
             },
             {
-                label: "13:30 - 14:30 | PAINEL 03",
-                title: "PRODUTIVIDADE COM GEMINI E WORKSPACE",
-                sub: "Convidados: Natan Valenciano e Igor Carolino",
-                ticker: "Descubra como a Inteligência Artificial pode acelerar sua rotina! 💡 • Lembre-se de conferir os Cursos Plus Brisa na plataforma"
+                label: "PILARES ESTRATÉGICOS",
+                title: "CULTURA DE ALTA PERFORMANCE",
+                sub: "REESTRUTURAÇÃO E EFICIÊNCIA",
+                ticker: "Revisão de indicadores e criação de novos canais. • Estratégia precisa descer para toda a operação."
             },
             {
-                label: "14:30 - 15:00 | INTERVALO",
-                title: "HORA DO CAFÉ",
-                sub: "Networking e pausa rápida",
-                ticker: "Voltamos em breve! Às 15:00 iniciaremos o Painel sobre Educação Financeira. • Estique as pernas e prepare-se!"
+                label: "FOCO: PESSOAS E CULTURA",
+                title: "CAPACITAÇÃO DE LIDERANÇAS",
+                sub: "CONTRATAÇÃO QUALIFICADA E CULTURA FORTE",
+                ticker: "A cultura atual não sustenta o crescimento necessário. • Aumentar receita com corporativo estruturado."
             },
             {
-                label: "15:00 - 16:30 | PAINEL 04",
-                title: "EDUCAÇÃO FINANCEIRA",
-                sub: "Estratégias com Ângelo Pessoa e Romário Aquino",
-                ticker: "Aprenda a cuidar do seu futuro financeiro! • Fique ligado nos quizzes para pontuar no Ranking da Unibrisa!"
+                label: "TECNOLOGIA E PROCESSO",
+                title: "ECOSSISTEMA DE APOIO",
+                sub: "INTEGRAÇÃO, IA E EXPERIÊNCIA",
+                ticker: "Apps unificados e redução de processos manuais. • Uso de IA para melhor experiência do cliente."
             },
             {
-                label: "16:30 - 16:50 | RESULTADOS",
-                title: "O PÓDIO DO CONHECIMENTO",
-                sub: "Conheça a Regional Destaque de hoje e o Top 5 Aprendentes!",
-                ticker: "Parabéns a todos os participantes! 🎉 • Continue sua jornada no Universo Brisa • O conhecimento transforma!"
+                label: "O PONTO MAIS ESTRATÉGICO",
+                title: "O PROBLEMA ESTÁ 'ENTRE' AS ÁREAS",
+                sub: "QUEBRAR SILOS E DECISÕES ISOLADAS",
+                ticker: "Eliminar a falta de colaboração e a baixa autonomia. • Accountability: franqueza com responsabilidade."
             },
             {
-                label: "16:50 - 17:00 | ENCERRAMENTO",
-                title: "MOMENTO Q&A DIRETORIA",
-                sub: "Converse com nossos Diretores e alinhe a estratégia",
-                ticker: "Nos vemos amanhã para mais conhecimento na Positivação Unibrisa 2026! • Obrigado pela excelente participação no dia de hoje!"
+                label: "MENSAGEM FINAL",
+                title: "NÃO TEMOS TEMPO: FAÇA HOJE",
+                sub: "O QUE JÁ PODE SER FEITO AMANHÃ?",
+                ticker: "Melhoria contínua e senso de urgência. • O problema não é o plano, é fazer o plano acontecer. • JUNTOS."
             }
         ];
 
         let currentIndex = 0;
 
-        // Función para actualizar a interface
         function updateUI() {
             const m = moments[currentIndex];
-            const gc = document.getElementById('gc-content');
+            const gc = document.getElementById('gc-main');
             
             gc.style.animation = 'none';
             void gc.offsetWidth; 
             gc.style.animation = null;
             
-            document.getElementById('moment-label').innerText = m.label;
+            // Atualiza numeração
+            const currentNum = (currentIndex + 1).toString().padStart(2, '0');
+            const totalNum = moments.length.toString().padStart(2, '0');
+            document.getElementById('panel-counter').innerText = `${currentNum} | ${totalNum}`;
+
+            document.getElementById('moment-label').querySelector('span').innerText = m.label;
             document.getElementById('main-title').innerText = m.title;
             document.getElementById('sub-title').innerText = m.sub;
             document.getElementById('ticker-text').innerText = m.ticker + " • " + m.ticker; 
         }
 
-        // Función para cambiar o momento
         function changeMoment(dir) {
             currentIndex += dir;
             if (currentIndex >= moments.length) currentIndex = 0;
@@ -259,28 +246,23 @@
             updateUI();
         }
 
-        // Atallos de teclado
         window.addEventListener('keydown', (e) => {
-            if (e.key === "ArrowRight") changeMoment(1);
+            if (e.key === "ArrowRight" || e.key === " ") changeMoment(1);
             if (e.key === "ArrowLeft") changeMoment(-1);
         });
 
-        // Garantir proporção 1920x1080 e escalar no preview
         function scaleToFit() {
             const viewport = document.getElementById('main-container');
             const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-            
-            // Centralizar caso o aspecto da janela non sexa 16:9
             const left = (window.innerWidth - (1920 * scale)) / 2;
             const top = (window.innerHeight - (1080 * scale)) / 2;
-            
             viewport.style.transform = `scale(${scale})`;
             viewport.style.left = `${left}px`;
             viewport.style.top = `${top}px`;
         }
 
         window.addEventListener('resize', scaleToFit);
-        scaleToFit(); // Executar inicio
+        scaleToFit(); 
         updateUI();
     </script>
 </body>
